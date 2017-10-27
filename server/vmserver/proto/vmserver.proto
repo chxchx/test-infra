@@ -1,0 +1,57 @@
+// Copyright 2017 Istio Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package vm;
+
+// Preprovision service manages a shared pool of VMs and handles pre-provision,
+// access synchronization, and reclamation (resembling a lock service)
+service Preprovision {
+	// Acquire requests from server exclusive access to a VM
+	rpc Acquire (VMConfig) returns (VMInstance);
+
+	// Release a VM back to the pool 
+	rpc Release (VMInstance) returns (Done);
+
+	// Renew the lease on the VM to avoid preemption
+	rpc KeepAlive (Client) returns (Done);
+}
+
+message VMConfig {
+	// Each client is identified with the namespace in which the tests run
+	// and is globally unique
+	string clientNamespace = 1;
+
+	// may extend with options such as cpu or mem in the future
+}
+
+message VMInstance {
+	// Uniquely identifies a VM instance
+	string vmName = 1;
+
+	// Pre-determined lease duration so both client and server agree when
+	// a VM is reclaimed even under network partition
+	int32 minutesToExpiration = 2;
+}
+
+message Client {
+	// Uniquely identifies a client
+	string clientNamespace = 1;
+}
+
+message Done {
+	// empty
+}
+
