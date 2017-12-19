@@ -18,17 +18,22 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"strings"
 
 	u "istio.io/test-infra/toolbox/util"
 )
 
 var (
-	repo       = flag.String("repo", "", "Optional. Update dependencies of only this repository")
+	repo       = flag.String("repo", "", "List of repos separated with comma")
 	owner      = flag.String("owner", "istio", "Github Owner or org")
 	tokenFile  = flag.String("token_file", "", "File containing Github API Access Token")
 	baseBranch = flag.String("base_branch", "master", "Branch from which the deps update commit is based")
 	hub        = flag.String("hub", "", "Where the testing images are hosted")
-	githubClnt *u.GithubClient
+	// repo SHA from CI build
+	proxySHA       = flag.String("proxy_sha", "", "The latest proxy SHA used in green build")
+	mixerclientSHA = flag.String("mixerclient_sha", "", "The latest mixerclient SHA used in green build")
+	apiSHA         = flag.String("api_sha", "", "The latest api SHA used in green build")
+	githubClnt     *u.GithubClient
 )
 
 const (
@@ -43,10 +48,12 @@ const (
 	debianSuffix      = "debs"
 
 	// Repos
-	pilotRepo = "pilot"
-	authRepo  = "auth"
-	mixerRepo = "mixer"
-	proxyRepo = "proxy"
+	pilotRepo       = "pilot"
+	authRepo        = "auth"
+	mixerRepo       = "mixer"
+	proxyRepo       = "proxy"
+	mixerclientRepo = "mixerclient"
+	apiRepo         = "api"
 )
 
 // Updates dependency objects in :deps to the latest stable version.
@@ -55,13 +62,13 @@ const (
 // Returns a list of dependencies that were stale and have just been updated
 func updateDepSHAGetFingerPrint(repo string, deps *[]u.Dependency) (string, []u.Dependency, error) {
 	var depChangeList []u.Dependency
-	digest, err := githubClnt.GetHeadCommitSHA(repo, *baseBranch)
+	parentSHA, err := githubClnt.GetHeadCommitSHA(repo, *baseBranch)
 	if err != nil {
 		return "", depChangeList, err
 	}
-	digest += *baseBranch + *hub
+	digest := parentSHA + *baseBranch + *hub
 	for i, dep := range *deps {
-		commitSHA, err := githubClnt.GetHeadCommitSHA(dep.RepoName, dep.ProdBranch)
+		commitSHA, err := getSHAFromFlag(dep.RepoName)
 		if err != nil {
 			return "", depChangeList, err
 		}
@@ -70,9 +77,23 @@ func updateDepSHAGetFingerPrint(repo string, deps *[]u.Dependency) (string, []u.
 			(*deps)[i].LastStableSHA = commitSHA
 			depChangeList = append(depChangeList, (*deps)[i])
 		}
-
 	}
 	return u.GetMD5Hash(digest), depChangeList, nil
+}
+
+func getSHAFromFlag(depRepoName string) (string, error) {
+	switch depRepoName {
+	case proxyRepo:
+		u.AssertNotEmpty("proxy_sha", proxySHA)
+		return *proxySHA, nil
+	case mixerclientRepo:
+		u.AssertNotEmpty("mixerclient_sha", mixerclientSHA)
+		return *mixerclientSHA, nil
+	case apiRepo:
+		u.AssertNotEmpty("api_sha", apiSHA)
+		return *apiSHA, nil
+	}
+	return "", fmt.Errorf("no flag defined for %s", depRepoName)
 }
 
 func generateArtifactURL(repo, ref, suffix string) string {
@@ -190,20 +211,10 @@ func init() {
 }
 
 func main() {
-	if *repo != "" { // only update dependencies of this repo
-		if err := updateDependenciesOf(*repo); err != nil {
+	u.AssertNotEmpty("repo", repo)
+	for _, r := range strings.Split(*repo, ",") {
+		if err := updateDependenciesOf(r); err != nil {
 			log.Fatalf("Failed to udpate dependency: %v\n", err)
-		}
-	} else { // update dependencies of all repos in the istio project
-		repos, err := githubClnt.ListRepos()
-		if err != nil {
-			log.Fatalf("Error when fetching list of repos: %v\n", err)
-			return
-		}
-		for _, r := range repos {
-			if err := updateDependenciesOf(r); err != nil {
-				log.Fatalf("Failed to udpate dependency: %v\n", err)
-			}
 		}
 	}
 }
