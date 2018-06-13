@@ -22,9 +22,25 @@ go_test(
     srcs = [
         "ci_test.go",
         "sisyphusd_test.go",
+        "storage_test.go"
     ],
     data = ["//sisyphus/test_data:testdata"],
     embed = [":go_default_library"],
     importpath = "istio.io/test-infra/sisyphus",
-    deps = ["//toolbox/util:go_default_library"],
+    deps = [
+        "//toolbox/util:go_default_library",
+        "//vendor/github.com/golang/glog:go_default_library",
+    ],
+)
+
+go_test(
+    name = "storage_test",
+    srcs = ["storage_test.go"],
+    data = ["//sisyphus/test_data:testdata"],
+    embed = [":go_default_library"],
+    importpath = "istio.io/test-infra/sisyphus",
+    deps = [
+        "//toolbox/util:go_default_library",
+        "//vendor/github.com/golang/glog:go_default_library",
+    ],
 )
