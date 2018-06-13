@@ -38,21 +38,21 @@ func NewStorage() *DefaultStorage {
 
 // Store records FlakeStat to durable storage
 func (s *DefaultStorage) Store(jobName, sha string, newFlakeStat FlakeStat) error {
-	log.Printf("newFlakeStat = %v\n", newFlakeStat)
+	glog.Infof("newFlakeStat = %v\n", newFlakeStat)
 	return nil
 }
 
 // SpannerStorage stores flakiness data on cloud spanner
 type SpannerStorage struct {
-	client spanner.Client
+	client *spanner.Client
 }
 
 // NewSpannerStorage creates a new Storage
 func NewSpannerStorage(project, instance, database string) *SpannerStorage {
-	db := fmt.Sprintf("projects/%s/instances/%s/database/%s", project, instance, database)
+	db := fmt.Sprintf("projects/%s/instances/%s/databases/%s", project, instance, database)
 	clnt, err := spanner.NewClient(context.Background(), db)
 	if err != nil {
-		glog.Fatalf("Unable to connect to spanner db %s", db)
+		glog.Fatalf("Unable to connect to spanner db %s: %v", db, err)
 	}
 	return &SpannerStorage{
 		client: clnt,
@@ -61,7 +61,7 @@ func NewSpannerStorage(project, instance, database string) *SpannerStorage {
 
 // Store records FlakeStat to durable storage
 func (s *SpannerStorage) Store(jobName, sha string, newFlakeStat FlakeStat) error {
-	log.Printf("newFlakeStat = %v\n", newFlakeStat)
+	glog.Infof("newFlakeStat = %v\n", newFlakeStat)
 	mutation := spanner.InsertMap("flake_stats", map[string]interface{}{
 		"test_name":   jobName,
 		"sha":         sha,

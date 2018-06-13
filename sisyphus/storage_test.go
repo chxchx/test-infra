@@ -15,25 +15,20 @@
 package sisyphus
 
 import (
-	"fmt"
-	"path/filepath"
-	"reflect"
-	"strings"
 	"testing"
-
-	u "istio.io/test-infra/toolbox/util"
 )
 
 const (
 	project  = "istio"
 	instance = "sisyphus"
-	database = "sisyphus-db"
+	// instance = "Sisyphus"
+	database = "sisyphusdb"
 )
 
 func TestGetLatestRunOnProw(t *testing.T) {
 	storage := NewSpannerStorage(project, instance, database)
 	expectedJob := "job"
-	expectedSHA := 123
+	expectedSHA := "sha123"
 	expectedRerun := 3
 	expectedFailures := 1
 	expectedStat := FlakeStat{
@@ -42,7 +37,7 @@ func TestGetLatestRunOnProw(t *testing.T) {
 		TotalRerun: expectedRerun,
 		Failures:   expectedFailures,
 	}
-	if storage.Store(expectedJob, expectedSHA, expectedStat) != nil {
+	if err := storage.Store(expectedJob, expectedSHA, expectedStat); err != nil {
 		t.Errorf("failed to store: %v", err)
 	}
 }
