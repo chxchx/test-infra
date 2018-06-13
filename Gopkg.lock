@@ -4,11 +4,15 @@
 [[projects]]
   name = "cloud.google.com/go"
   packages = [
+    "civil",
     "compute/metadata",
     "iam",
     "internal",
+    "internal/atomiccache",
+    "internal/fields",
     "internal/optional",
     "internal/version",
+    "spanner",
     "storage"
   ]
   revision = "050b16d2314d5fc3d4c9a51e4cd5c7468e77f162"
@@ -76,6 +80,8 @@
     "ptypes",
     "ptypes/any",
     "ptypes/duration",
+    "ptypes/empty",
+    "ptypes/struct",
     "ptypes/timestamp"
   ]
   revision = "1643683e1b54a9e88ad26d98f81400c8c9d9f4f9"
@@ -133,12 +139,6 @@
   name = "github.com/hashicorp/go-multierror"
   packages = ["."]
   revision = "83588e72410abfbe4df460eeb6f30841ae47d4c4"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/marcacohen/gcslock"
-  packages = ["."]
-  revision = "5782a95db7e207c634ebf85ca8fcd970b7a27ac5"
 
 [[projects]]
   name = "github.com/matttproud/golang_protobuf_extensions"
@@ -219,6 +219,21 @@
   packages = ["."]
   revision = "583c0c0531f06d5278b7d917446061adc344b5cd"
   version = "v1.0.1"
+
+[[projects]]
+  name = "go.opencensus.io"
+  packages = [
+    "internal/tagencoding",
+    "plugin/grpc",
+    "plugin/grpc/grpcstats",
+    "plugin/grpc/grpctrace",
+    "stats",
+    "tag",
+    "trace",
+    "trace/propagation"
+  ]
+  revision = "7e6c5d736280267bc85cfd63b23507c4889ef82e"
+  version = "v0.2.0"
 
 [[projects]]
   branch = "master"
@@ -314,6 +329,7 @@
     "iterator",
     "option",
     "storage/v1",
+    "transport/grpc",
     "transport/http"
   ]
   revision = "3b6ce7577f7305c6ba51dce053082c2aed563378"
@@ -329,7 +345,9 @@
     "internal/log",
     "internal/modules",
     "internal/remote_api",
+    "internal/socket",
     "internal/urlfetch",
+    "socket",
     "urlfetch"
   ]
   revision = "150dc57a1b433e64154302bdc40b6bb8aefa313a"
@@ -341,7 +359,9 @@
   packages = [
     "googleapis/api/annotations",
     "googleapis/iam/v1",
-    "googleapis/rpc/status"
+    "googleapis/rpc/errdetails",
+    "googleapis/rpc/status",
+    "googleapis/spanner/v1"
   ]
   revision = "11c7f9e547da6db876260ce49ea7536985904c9b"
 
@@ -353,6 +373,7 @@
     "codes",
     "connectivity",
     "credentials",
+    "credentials/oauth",
     "grpclb/grpc_lb_v1/messages",
     "grpclog",
     "internal",
@@ -492,6 +513,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "1eaefe441d13a6cd11a36d7770d77cef3d3904b5c5b4e0de65441f012165e0c6"
+  inputs-digest = "ef8cbb2739195d3de69472b2c281a54e7ee8a2fc210746a87928e3ca6dc3acae"
   solver-name = "gps-cdcl"
   solver-version = 1

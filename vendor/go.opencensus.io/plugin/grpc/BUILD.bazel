@@ -1,0 +1,15 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = ["grpc.go"],
+    importmap = "com_github_istio_test_infra/vendor/go.opencensus.io/plugin/grpc",
+    importpath = "go.opencensus.io/plugin/grpc",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vendor/go.opencensus.io/plugin/grpc/grpcstats:go_default_library",
+        "//vendor/go.opencensus.io/plugin/grpc/grpctrace:go_default_library",
+        "//vendor/golang.org/x/net/context:go_default_library",
+        "//vendor/google.golang.org/grpc/stats:go_default_library",
+    ],
+)

@@ -17,7 +17,6 @@ package sisyphus
 import (
 	"context"
 	"fmt"
-	"glog"
 
 	"cloud.google.com/go/spanner"
 	"github.com/golang/glog"

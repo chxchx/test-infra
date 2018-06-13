@@ -1,0 +1,27 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "aggregation.go",
+        "aggregation_data.go",
+        "collector.go",
+        "doc.go",
+        "export.go",
+        "measure.go",
+        "measure_float64.go",
+        "measure_int64.go",
+        "validation.go",
+        "view.go",
+        "window.go",
+        "worker.go",
+        "worker_commands.go",
+    ],
+    importmap = "com_github_istio_test_infra/vendor/go.opencensus.io/stats",
+    importpath = "go.opencensus.io/stats",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//vendor/go.opencensus.io/internal/tagencoding:go_default_library",
+        "//vendor/go.opencensus.io/tag:go_default_library",
+    ],
+)
